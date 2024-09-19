@@ -1,4 +1,4 @@
-package com.techtech;
+package com.techtech.entity;
 
 import java.sql.Timestamp;
 
