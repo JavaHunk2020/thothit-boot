@@ -1,5 +1,5 @@
+<%@page import="com.techtech.entity.ProductEntity"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.techtech.ProductEntity"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.time.LocalDateTime"%>
@@ -43,21 +43,35 @@
 			  				  	<label><b>Photo</b></label>
 			  	           <input type="text" class="form-control" name="photo"/>
 			  	
-			  	
-			  	<button type="submit" class="btn btn-primary mt-2">Add Product!</button>
+			  	    <button type="submit" class="btn btn-primary mt-2">Add Product!</button>
 			  </form>
+			  
 			  <hr/>
 		</div>
+		<form action="searchProduct" method="get">
+			        <input type="text" class="form-control" name="stext" style="width: 200px;display: inline;">
+			  	    <button type="submit" class="btn btn-success">Search Product!</button>
+			  	</form>
+		
 		<hr/>
+		
+		<img src="api/chart">
+		
 		<span style="color:red;font-size: 16px;font-weight: bold;"> ${message}</span>
 		
 		<table class="table table-bordered">
     <thead>
       <tr>
         <th>Pid</th>
-        <th>Name</th>
+        <th>
+        <a href="sorting?attribute=name&orderBy=${orderBy}">
+        Name
+        </a>
+        </th>
         <th>Price</th>
-        <th>Category</th>
+        <th> <a href="sorting?attribute=category&orderBy=${orderBy}">
+        Category
+        </a></th>
          <th>Photo</th>
           <th>Action</th>
       </tr>
