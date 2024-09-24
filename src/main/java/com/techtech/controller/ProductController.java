@@ -1,5 +1,6 @@
 package com.techtech.controller;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,6 +143,14 @@ public class ProductController {
 				"Product", // X-axis label (String)
 				"Sales (in $)", // Y-axis label (Double)
 				dataset);
+		
+		
+		// Step 3: Customize the Bar Renderer
+        CategoryPlot plot = chart.getCategoryPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        // Set different colors for each bar
+        renderer.setSeriesPaint(0, Color.ORANGE);
+        renderer.setSeriesPaint(1, Color.MAGENTA);
 
 		// Convert the chart to an image (PNG)
 		BufferedImage chartImage = chart.createBufferedImage(800, 600);
@@ -160,7 +171,6 @@ public class ProductController {
 		//map = {Mobile,24}
 		
 		List<ProductEntity> productList = productService.findAll();
-		
 		Map<String,Double> map =new HashMap<>();
 		for(ProductEntity pe :productList){
 			  String category=pe.getCategory();
@@ -172,8 +182,10 @@ public class ProductController {
 				  map.put(category, currentPrice);
 			  }
 		}
+	
 		
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		
 		// Add data (Product name as X-axis and Sales value as Y-axis)
 		map.forEach((category,price)->{
 			dataset.addValue(price, "Sales", category); // X-axis: Product A, Y-axis: 25000.0
