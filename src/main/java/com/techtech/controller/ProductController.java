@@ -7,7 +7,9 @@ import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -117,6 +119,8 @@ public class ProductController {
 
 	@GetMapping("/api/chart")
 	public ResponseEntity<byte[]> getBarChart() throws IOException {
+		
+		
 		byte[] chartImage = generateBarChart();
 
 		// Set HTTP Headers
@@ -146,13 +150,34 @@ public class ProductController {
 
 	// Create dataset with String as X-axis values and Double as Y-axis values
 	private CategoryDataset createDataset() {
+		
+		//Mobile, 12
+		//Mobile 8
+		//Mobile, 4
+		
+		//T-Shirt -12
+		
+		//map = {Mobile,24}
+		
+		List<ProductEntity> productList = productService.findAll();
+		
+		Map<String,Double> map =new HashMap<>();
+		for(ProductEntity pe :productList){
+			  String category=pe.getCategory();
+			  double currentPrice =pe.getPrice();
+			  if(map.containsKey(category)) {
+				  double priceInMap=map.get(category);
+				  map.put(category, priceInMap+currentPrice);
+			  }else {
+				  map.put(category, currentPrice);
+			  }
+		}
+		
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		// Add data (Product name as X-axis and Sales value as Y-axis)
-		dataset.addValue(25000.0, "Sales", "Product A"); // X-axis: Product A, Y-axis: 25000.0
-		dataset.addValue(30000.0, "Sales", "Product B"); // X-axis: Product B, Y-axis: 30000.0
-		dataset.addValue(40000.0, "Sales", "Product C"); // X-axis: Product C, Y-axis: 40000.0
-		dataset.addValue(35000.0, "Sales", "Product D"); // X-axis: Product D, Y-axis: 35000.0
-		dataset.addValue(20000.0, "Sales", "Product E"); // X-axis: Product E, Y-axis: 20000.0
+		map.forEach((category,price)->{
+			dataset.addValue(price, "Sales", category); // X-axis: Product A, Y-axis: 25000.0
+		});
 		return dataset;
 	}
 
