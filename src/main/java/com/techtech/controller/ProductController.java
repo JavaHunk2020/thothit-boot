@@ -29,10 +29,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.techtech.entity.ProductEntity;
+import com.techtech.dto.ProductDTO;
 import com.techtech.service.ProductService;
 
 @Controller
@@ -42,46 +43,48 @@ public class ProductController {
 	private ProductService productService;
 
 	@PostMapping("/addProduct")
-	public String createProduct(HttpServletRequest req) {
-		String name = req.getParameter("name");
+	public String createProduct(@ModelAttribute ProductDTO productDTO,Model model) {
+		//BELOW LINES ARE REPLACED BY @ModelAttribute ProductDTO productDTO
+		/*String name = req.getParameter("name");
 		String price = req.getParameter("price");
 		String category = req.getParameter("category");
 		String photo = req.getParameter("photo");
-
-		ProductEntity entity = new ProductEntity();
-		entity.setCategory(category);
-		entity.setName(name);
-		entity.setPhoto(photo);
-		entity.setPrice(Double.parseDouble(price));
-		entity.setDoe(new Timestamp(new Date().getTime()));
-		productService.save(entity);
+		ProductDTO productDTO = new ProductDTO();
+		productDTO.setCategory(category);
+		productDTO.setName(name);
+		productDTO.setPhoto(photo);
+		productDTO.setPrice(Double.parseDouble(price));*/
+		
+		productDTO.setDoe(new Timestamp(new Date().getTime()));
+		productService.save(productDTO);
 
 		// Fetch akk the ProductEntity
-		List<ProductEntity> productList = productService.findAll();
-		req.setAttribute("productList", productList);
-		req.setAttribute("message", "Product is added into database");
+		List<ProductDTO> productList = productService.findAll();
+		model.addAttribute("productList", productList);
+		model.addAttribute("message", "Product is added into database");
 		return "addProduct";
 	}
 
 	@GetMapping({ "/showAddProduct", "/" })
-	public String showAddProductPage(HttpServletRequest req) {
+	public String showAddProductPage(Model model) {
 		// I WANT TO SHOW ALL THE PRODUCTS WHEN
 		// WE ARE OPENING ADD PRODUCT PAGE
-		List<ProductEntity> productList = productService.findAll();
-		req.setAttribute("productList", productList);
+		List<ProductDTO> productList = productService.findAll();
+		model.addAttribute("productList", productList);
 		return "addProduct";
 	}
 
 	@GetMapping("/deleteProduct")
-	public String bananana(HttpServletRequest req) {
-		String pid = req.getParameter("pid");
+	public String bananana(@RequestParam("pid") String cpid,Model model) {
+		
+		//RequestParam String pid
+		//String pid = req.getParameter("pid");
 		// I WANT TO SHOW ALL THE PRODUCTS WHEN
 		// WE ARE OPENING ADD PRODUCT PAGE
-		productService.deleteById(Integer.parseInt(pid));
-
-		List<ProductEntity> productList = productService.findAll();
-		req.setAttribute("productList", productList);
-		req.setAttribute("message", "Product is delete from database");
+		productService.deleteById(Integer.parseInt(cpid));
+		List<ProductDTO> productList = productService.findAll();
+		model.addAttribute("productList", productList);
+		model.addAttribute("message", "Product is delete from database");
 		return "addProduct";
 	}
 
@@ -89,7 +92,7 @@ public class ProductController {
 	public String searchProduct(@RequestParam String stext, Model model) {
 		// I WANT TO SHOW ALL THE PRODUCTS WHEN
 		// WE ARE OPENING ADD PRODUCT PAGE
-		List<ProductEntity> productList = productService.seachProduct(stext);
+		List<ProductDTO> productList = productService.seachProduct(stext);
 		model.addAttribute("productList", productList);
 		return "addProduct";
 	}
@@ -99,21 +102,21 @@ public class ProductController {
 	public String sortingBy(@RequestParam String attribute, @RequestParam String orderBy, Model model) {
 		// I WANT TO SHOW ALL THE PRODUCTS WHEN
 		// WE ARE OPENING ADD PRODUCT PAGE
-		List<ProductEntity> productList = productService.findAll();
+		List<ProductDTO> productList = productService.findAll();
 		if (attribute.equals("name") && orderBy.equals("asc")) {
 			model.addAttribute("orderBy", "desc");
-			Collections.sort(productList, Comparator.comparing(ProductEntity::getName));
+			Collections.sort(productList, Comparator.comparing(ProductDTO::getName));
 		} else if (attribute.equals("name") && orderBy.equals("desc")) {
 			model.addAttribute("orderBy", "asc");
-			Collections.sort(productList, Comparator.comparing(ProductEntity::getName).reversed());
+			Collections.sort(productList, Comparator.comparing(ProductDTO::getName).reversed());
 		}
 
 		if (attribute.equals("category") && orderBy.equals("asc")) {
 			model.addAttribute("orderBy", "desc");
-			Collections.sort(productList, Comparator.comparing(ProductEntity::getCategory));
+			Collections.sort(productList, Comparator.comparing(ProductDTO::getCategory));
 		} else if (attribute.equals("category") && orderBy.equals("desc")) {
 			model.addAttribute("orderBy", "asc");
-			Collections.sort(productList, Comparator.comparing(ProductEntity::getCategory).reversed());
+			Collections.sort(productList, Comparator.comparing(ProductDTO::getCategory).reversed());
 		}
 
 		model.addAttribute("productList", productList);
@@ -170,9 +173,9 @@ public class ProductController {
 		
 		//map = {Mobile,24}
 		
-		List<ProductEntity> productList = productService.findAll();
+		List<ProductDTO> productList = productService.findAll();
 		Map<String,Double> map =new HashMap<>();
-		for(ProductEntity pe :productList){
+		for(ProductDTO pe :productList){
 			  String category=pe.getCategory();
 			  double currentPrice =pe.getPrice();
 			  if(map.containsKey(category)) {

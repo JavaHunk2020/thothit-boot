@@ -1,4 +1,4 @@
-<%@page import="com.techtech.entity.ProductEntity"%>
+<%@page import="com.techtech.dto.ProductDTO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
@@ -79,13 +79,13 @@
     <tbody>
       <%
       //This is standard code to access the map
-	   List<ProductEntity>  productList=(List<ProductEntity>)request.getAttribute("productList");
+	   List<ProductDTO>  productList=(List<ProductDTO>)request.getAttribute("productList");
       if(productList==null){
     	  productList=new ArrayList<>();
       }
       int count=1;
       //Set<Entry<String,LocalDateTime> >
-      for(ProductEntity item :productList) {
+      for(ProductDTO item :productList) {
       %>
       <tr>
     <td><%=item.getPid()%></td>
