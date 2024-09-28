@@ -1,9 +1,10 @@
 package com.techtech.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,19 +13,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techtech.dto.DogDTO;
+import com.techtech.service.DogService;
 
 @RestController
 @RequestMapping("/v1")
 public class DogRestController {
+	
+	final private DogService dogService;
+	
+	/**
+	 * this is called constructor injection
+	 * @param dogService
+	 */
+	public DogRestController(final DogService dogService) {
+		this.dogService=dogService;
+	}
 
 	// ENDPOINT = http://localhost:444/v1/dogs
 	@GetMapping("/dogs")
 	public List<DogDTO> showDogs() {
-		List<DogDTO> dtos = new ArrayList<DogDTO>();
-		dtos.add(new DogDTO(1, "Jacky", "red"));
-		dtos.add(new DogDTO(2, "Macky", "white"));
-		dtos.add(new DogDTO(3, "Gogar", "blue"));
-		return dtos;
+		return dogService.findDogs();
 	}
 
 	// /dogs?did=12
@@ -40,11 +48,18 @@ public class DogRestController {
 	 * @param dogDTO
 	 * @return
 	 */
+	// 201 -CREATED
 	@PostMapping("/dogs")
-	public DogDTO createDog(@RequestBody DogDTO dogDTO) {
-		System.out.println("request payload = " + dogDTO);
-		dogDTO.setDid(new Random().nextInt());
-		return dogDTO;
+	public ResponseEntity<DogDTO>  createDog(@RequestBody DogDTO dogDTO) {
+		dogDTO=dogService.save(dogDTO);
+		return new ResponseEntity<DogDTO>(dogDTO,HttpStatus.CREATED);
+	}
+	
+	///http://localhost:444/v1/dogs/1
+	@DeleteMapping("/dogs/{did}")
+	public ResponseEntity<Void> deleteDog(@PathVariable int did) {
+		dogService.deleteDog(did);
+		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
 
 }
