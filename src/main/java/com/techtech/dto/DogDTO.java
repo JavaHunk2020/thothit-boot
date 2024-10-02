@@ -1,7 +1,7 @@
 package com.techtech.dto;
 
 public class DogDTO {
-	int did;
+	Integer did;
 	String name;
 	String color;
 	
