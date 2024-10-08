@@ -127,6 +127,7 @@
       <div class="modal-body">
       		<form method="POST" enctype="multipart/form-data" action="uploadImage">
   				  <label for="file">Choose an image:</label>
+  				   <input type="hidden" name="pid" value="13"/>
   				  <input class="form-control" type="file" name="file" accept="image/*">
   				  <hr/>
    				 <button class="btn btn-success" type="submit">Upload</button>
