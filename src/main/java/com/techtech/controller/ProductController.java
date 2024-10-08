@@ -41,6 +41,16 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
+	
+	@PostMapping("/uploadImage")
+	public String uploadProductImage(@ModelAttribute ProductDTO productDTO,Model model) {
+		// Fetch akk the ProductEntity
+				List<ProductDTO> productList = productService.findAll();
+				model.addAttribute("productList", productList);
+				model.addAttribute("message", "Product image is uploaded");
+				return "addProduct";
+	
+	}
 
 	@PostMapping("/addProduct")
 	public String createProduct(@ModelAttribute ProductDTO productDTO,Model model) {

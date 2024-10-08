@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionAdvice {
-	
 	//	throw new DogNotFoundException("Hey! it seems like this dog does not exist!");
 	@ExceptionHandler(DogNotFoundException.class)
 	public ResponseEntity<ErrorMessage> generateIt(DogNotFoundException ex){
@@ -16,5 +15,12 @@ public class GlobalExceptionAdvice {
 		errorMessage.setCode("C0192");
 		return new ResponseEntity<>(errorMessage,HttpStatus.NOT_FOUND);
 	}
-
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorMessage> generateIt(Exception ex){
+		ErrorMessage errorMessage=new ErrorMessage();
+		errorMessage.setMessage(ex.getMessage());
+		errorMessage.setCode("C500");
+		return new ResponseEntity<>(errorMessage,HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

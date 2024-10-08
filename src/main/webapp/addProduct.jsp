@@ -93,7 +93,8 @@
         <td><%=item.getPrice()%></td>
         <td><%=item.getCategory()%></td>
         <td>
-			<img alt="" src="<%=item.getPhoto()%>" style="height: 120px;">          
+			<img alt="" src="<%=item.getPhoto()%>" style="height: 120px;">  
+			<button data-bs-toggle="modal" data-bs-target="#uploadPhoto" class="btn btn-warning">Upload Images</button>        
         </td>
          <td>
            <a href="deleteProduct?pid=<%=item.getPid()%>">
@@ -108,6 +109,38 @@
 		
 		
 	</div>
+	
+	
+	
+	<!-- The Modal -->
+<div class="modal" id="uploadPhoto">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Upload Photo</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+      		<form method="POST" enctype="multipart/form-data" action="uploadImage">
+  				  <label for="file">Choose an image:</label>
+  				  <input class="form-control" type="file" name="file" accept="image/*">
+  				  <hr/>
+   				 <button class="btn btn-success" type="submit">Upload</button>
+		</form>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
 	
 	
 	
