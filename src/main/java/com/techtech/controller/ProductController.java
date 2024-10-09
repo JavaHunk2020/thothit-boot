@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -42,66 +42,51 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
-
+	
+	//http://localhost:5656/renderPhoto?piid=2
+	@GetMapping("renderPhoto")
+	public void renderPhoto(@RequestParam long piid, HttpServletResponse response) throws IOException {
+		byte[] photo = productService.findProductImageById(piid);
+		response.setContentType("image/png");
+		response.getOutputStream().write(photo);
+	}
+	
+	
+	  //<input type="hidden" name="pid" value="13"/>
+		//  <input class="form-control" type="file" name="file" accept="image/*">
+	
 	@PostMapping("/uploadImage")
-    public String uploadImage(, RedirectAttributes redirectAttributes) {
-        if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Please select a file to upload.");
-            return "redirect:/";
-        }
-
-        try {
-            // Get the file and save it to the uploads folder
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
-            Files.write(path, bytes);
-
-            // Add message to be displayed after successful upload
-            redirectAttributes.addFlashAttribute("message",
-                    "You successfully uploaded '" + file.getOriginalFilename() + "'");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return "redirect:/";
-    }
-}
-
-	// <input type="hidden" name="pid" value="13"/>
-	// <input class="form-control" type="file" name="file" accept="image/*">
-
-	@PostMapping("/uploadImage")
-	public String uploadProductImage(@RequestParam("file") MultipartFile file, @RequestParam("pid") int pid,
-			Model model) {
-		try {
-			// Get the file and save it to the uploads folder
-			byte[] bytes = file.getBytes();
-			String title = file.getOriginalFilename();
-				
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	public String uploadProductImage(@RequestParam("file") MultipartFile file,@RequestParam("pid") int pid,Model model) {
+		 try {
+	            // Get the file and save it to the uploads folder
+	            byte[] bytes = file.getBytes();
+	            String title=file.getOriginalFilename();
+	            productService.saveImage(title,bytes,pid);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+		
 		// Fetch akk the ProductEntity
-		List<ProductDTO> productList = productService.findAll();
-		model.addAttribute("productList", productList);
-		model.addAttribute("message", "Product image is uploaded");
-		return "addProduct";
-
+				List<ProductDTO> productList = productService.findAll();
+				model.addAttribute("productList", productList);
+				model.addAttribute("message", "Product image is uploaded");
+				return "addProduct";
+	
 	}
 
 	@PostMapping("/addProduct")
-	public String createProduct(@ModelAttribute ProductDTO productDTO, Model model) {
-		// BELOW LINES ARE REPLACED BY @ModelAttribute ProductDTO productDTO
-		/*
-		 * String name = req.getParameter("name"); String price =
-		 * req.getParameter("price"); String category = req.getParameter("category");
-		 * String photo = req.getParameter("photo"); ProductDTO productDTO = new
-		 * ProductDTO(); productDTO.setCategory(category); productDTO.setName(name);
-		 * productDTO.setPhoto(photo); productDTO.setPrice(Double.parseDouble(price));
-		 */
-
+	public String createProduct(@ModelAttribute ProductDTO productDTO,Model model) {
+		//BELOW LINES ARE REPLACED BY @ModelAttribute ProductDTO productDTO
+		/*String name = req.getParameter("name");
+		String price = req.getParameter("price");
+		String category = req.getParameter("category");
+		String photo = req.getParameter("photo");
+		ProductDTO productDTO = new ProductDTO();
+		productDTO.setCategory(category);
+		productDTO.setName(name);
+		productDTO.setPhoto(photo);
+		productDTO.setPrice(Double.parseDouble(price));*/
+		
 		productDTO.setDoe(new Timestamp(new Date().getTime()));
 		productService.save(productDTO);
 
@@ -122,10 +107,10 @@ public class ProductController {
 	}
 
 	@GetMapping("/deleteProduct")
-	public String bananana(@RequestParam("pid") String cpid, Model model) {
-
-		// RequestParam String pid
-		// String pid = req.getParameter("pid");
+	public String bananana(@RequestParam("pid") String cpid,Model model) {
+		
+		//RequestParam String pid
+		//String pid = req.getParameter("pid");
 		// I WANT TO SHOW ALL THE PRODUCTS WHEN
 		// WE ARE OPENING ADD PRODUCT PAGE
 		productService.deleteById(Integer.parseInt(cpid));
@@ -172,7 +157,8 @@ public class ProductController {
 
 	@GetMapping("/api/chart")
 	public ResponseEntity<byte[]> getBarChart() throws IOException {
-
+		
+		
 		byte[] chartImage = generateBarChart();
 
 		// Set HTTP Headers
@@ -192,13 +178,14 @@ public class ProductController {
 				"Product", // X-axis label (String)
 				"Sales (in $)", // Y-axis label (Double)
 				dataset);
-
+		
+		
 		// Step 3: Customize the Bar Renderer
-		CategoryPlot plot = chart.getCategoryPlot();
-		BarRenderer renderer = (BarRenderer) plot.getRenderer();
-		// Set different colors for each bar
-		renderer.setSeriesPaint(0, Color.ORANGE);
-		renderer.setSeriesPaint(1, Color.MAGENTA);
+        CategoryPlot plot = chart.getCategoryPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        // Set different colors for each bar
+        renderer.setSeriesPaint(0, Color.ORANGE);
+        renderer.setSeriesPaint(1, Color.MAGENTA);
 
 		// Convert the chart to an image (PNG)
 		BufferedImage chartImage = chart.createBufferedImage(800, 600);
@@ -209,32 +196,33 @@ public class ProductController {
 
 	// Create dataset with String as X-axis values and Double as Y-axis values
 	private CategoryDataset createDataset() {
-
-		// Mobile, 12
-		// Mobile 8
-		// Mobile, 4
-
-		// T-Shirt -12
-
-		// map = {Mobile,24}
-
+		
+		//Mobile, 12
+		//Mobile 8
+		//Mobile, 4
+		
+		//T-Shirt -12
+		
+		//map = {Mobile,24}
+		
 		List<ProductDTO> productList = productService.findAll();
-		Map<String, Double> map = new HashMap<>();
-		for (ProductDTO pe : productList) {
-			String category = pe.getCategory();
-			double currentPrice = pe.getPrice();
-			if (map.containsKey(category)) {
-				double priceInMap = map.get(category);
-				map.put(category, priceInMap + currentPrice);
-			} else {
-				map.put(category, currentPrice);
-			}
+		Map<String,Double> map =new HashMap<>();
+		for(ProductDTO pe :productList){
+			  String category=pe.getCategory();
+			  double currentPrice =pe.getPrice();
+			  if(map.containsKey(category)) {
+				  double priceInMap=map.get(category);
+				  map.put(category, priceInMap+currentPrice);
+			  }else {
+				  map.put(category, currentPrice);
+			  }
 		}
-
+	
+		
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
+		
 		// Add data (Product name as X-axis and Sales value as Y-axis)
-		map.forEach((category, price) -> {
+		map.forEach((category,price)->{
 			dataset.addValue(price, "Sales", category); // X-axis: Product A, Y-axis: 25000.0
 		});
 		return dataset;

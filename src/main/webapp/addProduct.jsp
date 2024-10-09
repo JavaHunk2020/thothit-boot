@@ -86,6 +86,11 @@
       int count=1;
       //Set<Entry<String,LocalDateTime> >
       for(ProductDTO item :productList) {
+     	  List<Long> imageIds=item.getImageIds();
+     	  if(imageIds==null){
+     		 imageIds=new ArrayList<>();
+     	  }
+     	  
       %>
       <tr>
     <td><%=item.getPid()%></td>
@@ -94,6 +99,13 @@
         <td><%=item.getCategory()%></td>
         <td>
 			<img alt="" src="<%=item.getPhoto()%>" style="height: 120px;">  
+			<%
+			 for(long iid : imageIds){
+			%>	 
+			     <img src="renderPhoto?piid=<%=iid %>" style="height: 120px;" alt="">
+			 <%
+			 }
+			%> 
 			<button data-bs-toggle="modal" data-bs-target="#uploadPhoto" class="btn btn-warning">Upload Images</button>        
         </td>
          <td>
@@ -106,6 +118,7 @@
       <%} %>
     </tbody>
   </table>
+		
 		
 		
 	</div>

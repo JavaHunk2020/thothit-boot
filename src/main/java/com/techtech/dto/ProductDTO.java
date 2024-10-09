@@ -1,6 +1,8 @@
 package com.techtech.dto;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductDTO {
 
@@ -10,6 +12,15 @@ public class ProductDTO {
 	private double price;
 	private String photo;
 	private Timestamp doe;
+	private List<Long> imageIds=new ArrayList<>();
+
+	public List<Long> getImageIds() {
+		return imageIds;
+	}
+
+	public void setImageIds(List<Long> imageIds) {
+		this.imageIds = imageIds;
+	}
 
 	public int getPid() {
 		return pid;
