@@ -14,6 +14,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script type="text/javascript">
+  		
+  
+       
+       function openModel(pid){
+    	   const myModal = new bootstrap.Modal(document.getElementById('uploadPhoto')); // creating modal object
+    	   myModal.show(); // show modal
+    	   document.getElementById('ppid').value=pid;
+    	   //<input type="hidden" id="ppid" name="pid" value="13"/>
+       }
+  
+  </script>
+  
 </head>
 <body>
 	<h1>Add Product Page</h1>
@@ -102,11 +116,13 @@
 			<%
 			 for(long iid : imageIds){
 			%>	 
+			     <a href="deleteRenderPhoto?piid=<%=iid %>">
 			     <img src="renderPhoto?piid=<%=iid %>" style="height: 120px;" alt="">
+			     </a>
 			 <%
 			 }
 			%> 
-			<button data-bs-toggle="modal" data-bs-target="#uploadPhoto" class="btn btn-warning">Upload Images</button>        
+			<button   onclick="openModel('<%=item.getPid()%>')"   data-bs-toggle="modal"  class="btn btn-warning">Upload Images</button>        
         </td>
          <td>
            <a href="deleteProduct?pid=<%=item.getPid()%>">
@@ -140,7 +156,7 @@
       <div class="modal-body">
       		<form method="POST" enctype="multipart/form-data" action="uploadImage">
   				  <label for="file">Choose an image:</label>
-  				   <input type="hidden" name="pid" value="13"/>
+  				   <input type="hidden" id="ppid" name="pid" value="13"/>
   				  <input class="form-control" type="file" name="file" accept="image/*">
   				  <hr/>
    				 <button class="btn btn-success" type="submit">Upload</button>

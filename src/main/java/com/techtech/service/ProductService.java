@@ -25,6 +25,10 @@ public class ProductService {
 	@Autowired
 	ProductImageRepository productImageRepository;
 	
+	public void deleteProductImageById(long piid) {
+		 productImageRepository.deleteById(piid);
+	}
+	
 	public byte[] findProductImageById(long piid) {
 		 Optional<ProductImage> optional=productImageRepository.findById(piid);
 		 return optional.isPresent()?optional.get().getPhoto():new byte[] {};

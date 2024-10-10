@@ -43,6 +43,17 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 	
+			
+	@GetMapping("deleteRenderPhoto")
+	public String deleteRenderPhoto(@RequestParam long piid, Model model) throws IOException {
+		productService.deleteProductImageById(piid);
+		// Fetch akk the ProductEntity
+		List<ProductDTO> productList = productService.findAll();
+		model.addAttribute("productList", productList);
+		model.addAttribute("message", "Product image is uploaded");
+		return "addProduct";
+	}
+	
 	//http://localhost:5656/renderPhoto?piid=2
 	@GetMapping("renderPhoto")
 	public void renderPhoto(@RequestParam long piid, HttpServletResponse response) throws IOException {
