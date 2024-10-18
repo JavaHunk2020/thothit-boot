@@ -1,9 +1,11 @@
 package com.techtech.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +22,32 @@ import com.techtech.dto.DogDTO;
 import com.techtech.dto.PatchDTO;
 import com.techtech.service.DogService;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+class UserRequestDTO {
+	String email;
+	String password;
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	@Override
+	public String toString() {
+		return "UserRequestDTO [email=" + email + ", password=" + password + "]";
+	}
+	
+	
+}
+
 @RestController
 @RequestMapping("/v1")
 public class DogRestController {
@@ -32,6 +60,25 @@ public class DogRestController {
 	 */
 	public DogRestController(final DogService dogService) {
 		this.dogService=dogService;
+	}
+	
+	@Value("${jwt.secret.key:ABUE87%&$&##@)@(&@*^@^@@@}")
+	private String jwtSecret;
+
+	private int jwtExpirationMs = 1800000;
+	
+	@GetMapping("/cauth")
+	public Map<String,Object> authUser(){
+		
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("auth", "Admin");
+		claims.put("company", "AbcTech");
+
+		String token= Jwts.builder().setSubject("jack@gmail.com").addClaims(claims).setIssuedAt(new Date())
+				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+				.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+		
+		return Map.of("Authentication",token);
 	}
 
 	// ENDPOINT = http://localhost:444/v1/dogs
