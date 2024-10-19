@@ -67,17 +67,23 @@ public class DogRestController {
 
 	private int jwtExpirationMs = 1800000;
 	
-	@GetMapping("/cauth")
-	public Map<String,Object> authUser(){
-		
-		Map<String, Object> claims = new HashMap<>();
-		claims.put("auth", "Admin");
-		claims.put("company", "AbcTech");
+	@PostMapping("/cauth")
+	public Map<String,Object> authUser(@RequestBody UserRequestDTO requestDTO){
 
-		String token= Jwts.builder().setSubject("jack@gmail.com").addClaims(claims).setIssuedAt(new Date())
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("company", "AbcTech");
+        String subject=requestDTO.getEmail();
+		if(requestDTO.getEmail().equalsIgnoreCase("jack@gmail.com") && "jill".equalsIgnoreCase(requestDTO.getPassword())) {
+			claims.put("scopes", List.of("customer"));
+		}else if(requestDTO.getEmail().equalsIgnoreCase("admin@gmail.com") && "admin".equalsIgnoreCase(requestDTO.getPassword())) {
+			claims.put("scopes", List.of("admin"));
+		}
+		String token= Jwts.builder().
+				setSubject(subject)
+				.addClaims(claims)
+				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
-		
 		return Map.of("Authentication",token);
 	}
 
