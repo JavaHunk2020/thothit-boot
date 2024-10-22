@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,34 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.techtech.dto.DogDTO;
 import com.techtech.dto.PatchDTO;
+import com.techtech.dto.UserRequestDTO;
 import com.techtech.service.DogService;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-class UserRequestDTO {
-	String email;
-	String password;
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	@Override
-	public String toString() {
-		return "UserRequestDTO [email=" + email + ", password=" + password + "]";
-	}
-	
-	
-}
-
+//MANY TO MANY Relationship
 @RestController
 @RequestMapping("/v1")
 public class DogRestController {
@@ -69,14 +49,14 @@ public class DogRestController {
 	
 	@PostMapping("/cauth")
 	public Map<String,Object> authUser(@RequestBody UserRequestDTO requestDTO){
-
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("company", "AbcTech");
+		claims.put("title", "Mr.");
         String subject=requestDTO.getEmail();
 		if(requestDTO.getEmail().equalsIgnoreCase("jack@gmail.com") && "jill".equalsIgnoreCase(requestDTO.getPassword())) {
-			claims.put("scopes", List.of("customer"));
+			claims.put("scopes", List.of("CUSTOMER"));
 		}else if(requestDTO.getEmail().equalsIgnoreCase("admin@gmail.com") && "admin".equalsIgnoreCase(requestDTO.getPassword())) {
-			claims.put("scopes", List.of("admin"));
+			claims.put("scopes", List.of("ADMIN"));
 		}
 		String token= Jwts.builder().
 				setSubject(subject)
@@ -89,6 +69,7 @@ public class DogRestController {
 
 	// ENDPOINT = http://localhost:444/v1/dogs
 	@GetMapping("/dogs")
+	@PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('CUSTOMER')")
 	public List<DogDTO> showDogs() {
 		return dogService.findDogs();
 	}
@@ -96,6 +77,7 @@ public class DogRestController {
 	// /dogs?did=12
 	// http://localhost:444/v1/dogs/1
 	@GetMapping("/dogs/{did}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public  ResponseEntity<DogDTO>  showDog(@PathVariable int did) {
 		DogDTO dogDTO=dogService.findById(did);
 		return new ResponseEntity<DogDTO>(dogDTO,HttpStatus.OK);
@@ -110,6 +92,7 @@ public class DogRestController {
 	// 201 -CREATED
 	//http://localhost:444/v1/dogs
 	@PostMapping("/dogs")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<DogDTO>  createDog(@RequestBody DogDTO dogDTO) {
 		//did must be null
 		dogDTO=dogService.save(dogDTO);
@@ -117,6 +100,7 @@ public class DogRestController {
 	}
 	
 	@PutMapping("/dogs")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<DogDTO>  updateDog(@RequestBody DogDTO dogDTO) {
 		///it must be not be null
 		 dogService.update(dogDTO);

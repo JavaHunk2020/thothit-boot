@@ -47,15 +47,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			//jwt =eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqYWNrQGdtYWlsLmNvbSIsImNvbXBhbnkiOiJBYmNUZWNoIiwic2NvcGVzIjpbImN1c3RvbWVyIl0sImlhdCI6MTcyOTI5NTgyNiwiZXhwIjoxNzI5Mjk3NjI2fQ.nHqqH2CvdaYm-GWfS6dyhSpkJZ4KDsoFkdRsqGtBiiiq1h9YfrA2FDBFhUWliKForbg1Clbwlo3ZE1J7Blq7Pg
 			String jwt = parseJwt(request);
 			if (jwt != null && validateJwtToken(jwt)) {
-				String email = getEmailFromJwtToken(jwt);
-			   UserDetails userDetails=userDetailsService.loadUserByUsername(email);
-        	   UsernamePasswordAuthenticationToken authentication =
-        	            new UsernamePasswordAuthenticationToken(
-        	                userDetails,
-        	                null,
-        	                null);
+				List<String> roleList = this.getRolesFromJwtToken(jwt);
+				List<SimpleGrantedAuthority> grantedAuthorities=roleList.stream().map(SimpleGrantedAuthority::new)
+				.collect(Collectors.toList());
+			   String email = getEmailFromJwtToken(jwt);
+			  UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+					   email, null,grantedAuthorities);
         	 ///SPRING SECURITY AUTHENTICATED YOU NOW GO AHEAD
-        	 SecurityContextHolder.getContext().setAuthentication(authentication);
+        	 SecurityContextHolder.getContext().setAuthentication(auth);
         }
     } catch (Exception e) {
       logger.error("Cannot set user authentication: {}", e);
